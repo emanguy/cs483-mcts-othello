@@ -16,8 +16,11 @@ struct node
 	int numChildren;
 	int numWins;
 	int numSimulations;
-}
+};
 
 void initNode(struct node *allocatedNode, struct board *boardState);
 struct node *expand(struct node *parentNode, int *action);
 void deconstructTree(struct node *rootNode);
+
+#endif
+
