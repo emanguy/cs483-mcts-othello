@@ -63,14 +63,12 @@ void copyBoard(struct board *source, struct board *dest)
  * @param output The array start position where the resulting row/column may be placed.
  * @return 1 if a space was found, 0 otherwise.
  */
-int followPiecesToTarget(int rowDirection, int colDirection, int row, int col, int target,
+int followPiecesToTarget(int rowDirection, int colDirection, int row, int col, int target, int followType,
 		int spaces[32][32], int *output)
 {
-	int piece;
-
-	while (row >= 0 && row < 32 && col >= 0 && col < 32 && spaces[row][col] != target)
+	while (row >= 0 && row < 32 && col >= 0 && col < 32 && 
+			spaces[row][col] != target && spaces[row][col] == followType)
 	{
-		piece = spaces[row][col];
 		row += rowDirection;
 		col += colDirection;
 		
@@ -86,27 +84,121 @@ int followPiecesToTarget(int rowDirection, int colDirection, int row, int col, i
 			output[1] = col;
 			return 1;
 		}
-		else if (spaces[row][col] != piece) // If I switch piece types without finding the target, stop
-		{
-			break;
-		}
 	}
 
 	return 0;
 }
 
+/*
+ * Pass in whose move it is, this function flips it to the other move.
+ *
+ * @param whoseMove Whose turn it is.
+ * @return 1 if 2 was passed, 2 if 1 was passed.
+ */
+int flipMove(int whoseMove)
+{
+	return whoseMove ^ 3;
+}
+
 void getMoves(struct board *gameBoard, int *outputArray)
 {
-	int i, j, k, outputIndex = 0;
+	int i, j, k, l, outputIndex = 0;
 
+	// Look for player's pieces
 	for (i = 0; i < 32; i++)
 	{
 		for (j = 0; j < 32; j++)
 		{
+			// If I find the player's piece, search outward in 8 directions to find a spot to play
 			if (gameBoard->spaces[i][j] == gameBoard->whoseMove)
 			{
-				for (k = 0; k < 9; )
+				for (k = -1; k <= 1; k++)
+				{
+					for (l = -1; l <= 1; l++)
+					{
+						outputIndex += 2 * followPiecesToTarget(k, l, i + k, j + l, 
+																0, flipMove(gameBoard->whoseMove),
+																gameBoard->spaces, outputArray + outputIndex);
+					}
+				}
 			}
 		}
+	}
+
+	// Add sentinel value at array end
+	outputArray[outputIndex] = -1;
+	outputArray[outputIndex + 1] = -1;
+}
+
+void placePiece(struct board *gameBoard, int *position)
+{
+	int i, j;
+	int result[2];
+
+	// Add one for placing the piece
+	if (gameBoard->whoseMove == 1)
+	{
+		gameBoard->whiteScore++;
+	}
+	else
+	{
+		gameBoard->blackScore++;
+	}
+
+	// Actually place the piece
+	gameBoard->spaces[position[0]][position[1]] = gameBoard->whoseMove;
+
+	for (i = -1; i <= 1; i++)
+	{
+		for (j = -1; j <= 1; j++)
+		{
+			// Follow surrounding opposite-colored pieces to a piece of player's color
+			if (1 == followPiecesToTarget(i, j, position[0] + i, position[1] + j,
+						gameBoard->whoseMove, flipMove(gameBoard->whoseMove),
+						gameBoard->spaces, result))
+			{
+				// Move off of the already-placed piece
+				result[0] -= i;
+				result[1] -= j;
+
+				// Flip pieces from the result back to the origin
+				while (result[0] != position[0] || result[1] != position[1])
+				{
+					gameBoard->spaces[result[0]][result[1]] = gameBoard->whoseMove;
+					if (gameBoard->whoseMove == 1)
+					{
+						gameBoard->whiteScore++;
+						gameBoard->blackScore--;
+					}
+					else
+					{
+						gameBoard->blackScore++;
+						gameBoard->whiteScore--;
+					}
+
+					result[0] -= i;
+					result[1] -= j;
+				}
+			}
+		}
+	}
+
+	// Flip whose turn it is
+	gameBoard->whoseMove = flipMove(gameBoard->whoseMove);
+}
+
+int determineWinner(struct board *gameBoard)
+{
+	if (gameBoard->whiteScore > gameBoard->blackScore)
+	{
+		return 1;
+	}
+	else if (gameBoard->whiteScore > gameBoard->blackScore) 
+	{
+		return 2;
+	}
+	else
+	{
+		return 0;
 	}
 }
