@@ -116,9 +116,9 @@ void getMoves(struct board *gameBoard, int *outputArray)
 				{
 					for (l = -1; l <= 1; l++)
 					{
-						outputIndex += 2 * followPiecesToTarget(k, l, i + k, j + l, 
-																0, flipMove(gameBoard->whoseMove),
-																gameBoard->spaces, outputArray + outputIndex);
+						outputIndex += 2 * followPiecesToTarget(k, l, i + k, j + l, 0, 
+								flipMove(gameBoard->whoseMove), 
+								gameBoard->spaces, outputArray + outputIndex);
 					}
 				}
 			}
@@ -153,7 +153,7 @@ void placePiece(struct board *gameBoard, int *position)
 		for (j = -1; j <= 1; j++)
 		{
 			// Follow surrounding opposite-colored pieces to a piece of player's color
-			if (1 == followPiecesToTarget(i, j, position[0] + i, position[1] + j,
+			if (1 == followPiecesToTarget(i, j, position[0] + i, position[1] + j, 
 						gameBoard->whoseMove, flipMove(gameBoard->whoseMove),
 						gameBoard->spaces, result))
 			{
