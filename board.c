@@ -59,6 +59,7 @@ void copyBoard(struct board *source, struct board *dest)
  * @param row The starting row (0-31)
  * @param col The starting column (0-31)
  * @param target The value of the space you're trying to find
+ * @param followType The value of the space you want to follow (so if I wanted to follow black spaces I'd put 2 for this)
  * @param spaces The physical board part of a board struct
  * @param output The array start position where the resulting row/column may be placed.
  * @return 1 if a space was found, 0 otherwise.
