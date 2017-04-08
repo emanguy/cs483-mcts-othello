@@ -7,20 +7,22 @@
 
 #include "board.h"
 
-struct node
+typedef struct Node
 {
-	struct node *parent;
-	struct board board;
-	struct board *children;
-	int *childMoves;
+	int id;
+	Node* parent;
+	struct board currBoard;
+	Node** children;
+	int* childMoves;
 	int numChildren;
 	int numWins;
 	int numSimulations;
-};
+} node;
 
-void initNode(struct node *allocatedNode, struct board *boardState);
-struct node *expand(struct node *parentNode, int *action);
-void deconstructTree(struct node *rootNode);
+void initializeRoot(node* root, struct board *boardState);
+node* expand(node *parentNode, int *action, int id);
+void deconstructTree(node* rootNode);
+void deleteNodes(node* currNode);
 
 #endif
 
