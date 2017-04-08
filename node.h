@@ -6,12 +6,13 @@
 #define NODE_H
 
 #include "board.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 typedef struct Node
 {
-	int id;
 	Node* parent;
-	struct board currBoard;
+	struct board board;
 	Node** children;
 	int* childMoves;
 	int numChildren;
@@ -20,7 +21,7 @@ typedef struct Node
 } node;
 
 void initializeRoot(node* root, struct board *boardState);
-node* expand(node *parentNode, int *action, int id);
+node* expand(node *parentNode, int *action);
 void deconstructTree(node* rootNode);
 void deleteNodes(node* currNode);
 

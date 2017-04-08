@@ -8,13 +8,12 @@ void initializeRoot(node* root, struct board *boardState){
     root->childMoves = (int *)malloc(2 * sizeof(int));
     root->numChildren = 0;
     root->numWins = 0;
-    root->board = *boardState;
+    //root->board = *boardState;
     root->numSimulations = 0;
     root->children = (node **)malloc(sizeof(node*));
-    root->id = 0;
 }
 
-node* expand(node* parentNode, int* action, int name){
+node* expand(node* parentNode, int* action){
 
     // Dynamically allocate new struct node
     node* newNode = (node *)malloc(sizeof(node));
@@ -26,9 +25,8 @@ node* expand(node* parentNode, int* action, int name){
     newNode->numWins = 0;
     newNode->numSimulations = 0;
     newNode->children = (node **)malloc(sizeof(node*));
-    newNode->id = name;
     //initBoard(&newNode->currBoard);
-    copyBoard(&parentNode->currBoard, &newNode->currBoard);
+    //copyBoard(&parentNode->board, &newNode->board);
 
     // Update parent node
     parentNode->children = (node **)realloc(parentNode->children, (parentNode->numChildren + 1) * sizeof(node*));
