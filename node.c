@@ -27,8 +27,10 @@ node* expand(node* parentNode, int* action, int name){
     newNode->numWins = 0;
     newNode->numSimulations = 0;
     newNode->children = (node **)malloc(sizeof(node*));
-    //initBoard(&newNode->currBoard);
-    //copyBoard(&parentNode->board, &newNode->board);
+
+    copyBoard(&parentNode->board, &newNode->board);
+    placePiece(&newNode->board, action);
+
 
     // Update parent node
     parentNode->children = (node **)realloc(parentNode->children, (parentNode->numChildren + 1) * sizeof(node*));
