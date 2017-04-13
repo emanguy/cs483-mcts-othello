@@ -33,7 +33,6 @@ node* expand(node* parentNode, int* action, int id);
 
 
 /* Recursively free all of the tree nodes starting at the provided root */
-void deconstructTree(node* rootNode);
-void deleteNodes(node* currNode);
+void deconstructTree(node* currNode);
 
 #endif

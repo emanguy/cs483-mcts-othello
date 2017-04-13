@@ -43,19 +43,13 @@ node* expand(node* parentNode, int* action, int name){
     return newNode;
 }
 
-// Bootstrap function for recursion
-void deconstructTree(node* rootNode){
-    deleteNodes(rootNode);
-    return;
-}
-
-void deleteNodes(node* currNode){
+void deconstructTree(node* currNode){
 
     node* currParent = NULL;
 
     // Go through children to the bottom of the right side of the tree
     if(currNode->numChildren != 0){
-        deleteNodes(currNode->children[currNode->numChildren - 1]);
+        deconstructTree(currNode->children[currNode->numChildren - 1]);
 	return;
     }
 
@@ -73,7 +67,7 @@ void deleteNodes(node* currNode){
     currNode = NULL;
 
     if (currParent != NULL){
-	deleteNodes(currParent);
+	deconstructTree(currParent);
     }
 
 }
