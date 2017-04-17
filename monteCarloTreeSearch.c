@@ -307,15 +307,15 @@ int main()
 				winner = determineWinner(gameBoard);
 				if(winner == 0)
 				{
-					print("This game was a tie");
+					printf("This game was a tie");
 				}
 				else if(winner == 1)
 				{
-					print("This game was won by White");
+					printf("This game was won by White");
 				}
 				else if(winner == 2)
 				{
-					print("This game was won by Black");
+					printf("This game was won by Black");
 				}
 			}	
 			//Continue the game
