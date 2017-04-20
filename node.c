@@ -9,7 +9,7 @@ void initializeRoot(node* root, struct board *boardState){
     root->childMoves = (int *)malloc(4 * sizeof(int));
     root->numChildren = 0;
     root->numWins = 0;
-    copyBoard(&boardState, &root->board);
+    copyBoard(boardState, &root->board);
     root->numSimulations = 0;
     root->children = (node **)malloc(2 * sizeof(node*));
 }
@@ -34,13 +34,13 @@ node* expand(node* parentNode, int* action){
 
 
     // Update parent node
-    if ((parentNode->numChildren != 0) && (parentNode->numChildren % 2 == 0)){
+    if ((parentNode->numChildren != 0) && (parentNode->numChildren & (parentNode->numChildren - 1) == 0)){
         parentNode->children = (node **)realloc(parentNode->children, parentNode->numChildren * 2 * sizeof(node*));
     }
 
     parentNode->children[parentNode->numChildren] = newNode;
 
-    if ((parentNode->numChildren != 0) && (parentNode->numChildren % 2 == 0)){
+    if ((parentNode->numChildren != 0) && (parentNode->numChildren & (parentNode->numChildren - 1) == 0)){
         parentNode->childMoves = (int *)realloc(parentNode->childMoves, parentNode->numChildren * 4 * sizeof(int));
     }
 
