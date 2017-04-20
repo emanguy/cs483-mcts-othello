@@ -29,7 +29,7 @@ void initializeRoot(node* root, struct board *boardState);
  * Return a pointer to the new node.
  * Uses copyBoard() to copy previous board's data into the new node.
  */
-node* expand(node* parentNode, int* action, int id);
+node* expand(node* parentNode, int* action);
 
 
 /* Recursively free all of the tree nodes starting at the provided root */

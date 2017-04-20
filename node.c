@@ -6,39 +6,49 @@ void initializeRoot(node* root, struct board *boardState){
 
     // Setting default values
     root->parent = NULL;
-    root->childMoves = (int *)malloc(2 * sizeof(int));
+    root->childMoves = (int *)malloc(4 * sizeof(int));
     root->numChildren = 0;
     root->numWins = 0;
-    root->board = *boardState;
+    copyBoard(&boardState, &root->board);
     root->numSimulations = 0;
-    root->children = (node **)malloc(sizeof(node*));
+    root->children = (node **)malloc(2 * sizeof(node*));
 }
 
 
-node* expand(node* parentNode, int* action, int name){
+node* expand(node* parentNode, int* action){
 
     // Dynamically allocate new struct node
     node* newNode = (node *)malloc(sizeof(node));
 
     // Setting member variables for new node
     newNode->parent = parentNode;
-    newNode->childMoves = (int *)malloc(2 * sizeof(int));
+    newNode->childMoves = (int *)malloc(4 * sizeof(int));
     newNode->numChildren = 0;
     newNode->numWins = 0;
     newNode->numSimulations = 0;
-    newNode->children = (node **)malloc(sizeof(node*));
+    newNode->children = (node **)malloc(2 * sizeof(node*));
+    printf("Mallocing space for new node to have 2 children\n");
 
     copyBoard(&parentNode->board, &newNode->board);
     placePiece(&newNode->board, action);
 
 
     // Update parent node
-    parentNode->children = (node **)realloc(parentNode->children, (parentNode->numChildren + 1) * sizeof(node*));
+    if ((parentNode->numChildren != 0) && (parentNode->numChildren % 2 == 0)){
+        parentNode->children = (node **)realloc(parentNode->children, parentNode->numChildren * 2 * sizeof(node*));
+    }
+
     parentNode->children[parentNode->numChildren] = newNode;
-    parentNode->childMoves = (int *)realloc(parentNode->childMoves, (parentNode->numChildren + 1) * 2 * sizeof(int));
+
+    if ((parentNode->numChildren != 0) && (parentNode->numChildren % 2 == 0)){
+        parentNode->childMoves = (int *)realloc(parentNode->childMoves, parentNode->numChildren * 4 * sizeof(int));
+    }
+
     parentNode->childMoves[parentNode->numChildren * 2] = action[0];
     parentNode->childMoves[parentNode->numChildren * 2 + 1] = action[1];
+
     parentNode->numChildren += 1;
+
 
     return newNode;
 }
