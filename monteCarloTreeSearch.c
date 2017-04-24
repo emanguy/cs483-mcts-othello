@@ -5,34 +5,36 @@
 *
 * Description: This file contains the code for the main of Othello and the monte Carlo Tree Search
 * code that will run the game Othello and determine the best move to be made.
-*
+* Compile using:
+* gcc -lm -Wall -o monteCarloTreeSearch monteCarloTreeSearch.c board.c node.c
+
 */
 
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h> 
-#include "board.h"
-#include "math.h"
+#include <math.h>
 #include "node.h"
+#include "board.h"
+
 
 void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 {
-	node *root; 				//root node
-	node *parentNode;           //node to hold the parentNode for backPropagation
-	node *newNode;              // tempNode for looping
-	node *selected;				//selected value for expansion
-	node *temp;					//temporary pointer for node
-	node *child;				//child node pointer
+	node root; 				//root node
+	node parentNode;           //node to hold the parentNode for backPropagation
+	node newNode;              // tempNode for looping
+	node selected;				//selected value for expansion
+	node child;				//child node pointer
 
-	struct board * boardState;  //gameboard pointer for use in simulation    
+	struct board boardState;  //gameboard pointer for use in simulation    
 
 
-	int * allActions;           //list of all actions returned by getMoves
-	int * action;				//action to be used for expansion
-	int * boardMove;            // boardMove for simulation
+	int allActions[200];           //list of all actions returned by getMoves
+	int action[2];				//action to be used for expansion
+	int boardMove[2];            // boardMove for simulation
 
 	int randomValue;			//randomValue stores generated value used to pick moves for simulation
-	int timeElapsed;			//used when calculated time taken to complete a loop
+	double timeElapsed;			//used when calculated time taken to complete a loop
 	int gameContinues;			//used to tell if game is still being simulated 
 	int numNewNodes = 0;		//keeps track of the number of nodes created
 	int winner;					//used for determining the winner
@@ -40,17 +42,16 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 	int numSims = 0;			//used to tally simulations for back-propagation
 	int i;						//loop value
 	int j;						//loop value
-	int sum;					//used for summing the wins and simulations 
   	int index;					//used for finding the index of the move to be made 
   	int flag = 10;				//used if there are no moves to be made by the player
 	int numOfActions;			//used to track the number of moves available in simulation phase
 
 	double uctValue;			//used when calculating the node to expand
 	double bestValue;			//used to store the best value for expansion
-	clock_t startTime, timeCheck; //used to calculate the time that has passed
+	time_t startTime, checkTime; //used to calculate the time that has passed
 
-	startTime = clock();				//track time limit
-	initializeRoot(root, gameBoard);	  // initialize root
+	time(&startTime);				//track time limit
+	initializeRoot(&root, gameBoard);	  // initialize root  
 	newNode = root;  					// temporary newNode
 	selected = root;					//initialize selected value for expansion
 
@@ -63,13 +64,14 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		//1. Select a node using UCT and the functions provided by #1. (See the js implementation of 
 		//selection and the js UCT implementation as a guide).
 
+		printf("Selection\n");
 		//UCT calculation to select next node 
-		for(i = 0; i < newNode->numChildren; i++)
+		for(i = 0; i < newNode.numChildren; i++)
 		{
-			child = newNode->children[i];
+			child = *newNode.children[i];
 			//UCT calculation
-			uctValue = child->numWins / child->numSimulations + 
-			sqrt(2 * log(newNode->numSimulations / child->numSimulations));
+			uctValue = child.numWins / child.numSimulations + 
+			sqrt(2 * log(newNode.numSimulations / child.numSimulations));
 
 			//check if the uct value for each child is better than the one before
 			if(uctValue > bestValue)
@@ -79,11 +81,14 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 			}
 		} 
 
+		newNode = selected;
+		printf("After selection\n");
 
-		
-		getMoves(gameBoard, allActions);
+		getMoves(&selected.board, allActions);
 		//2. Expand the selected node using the expand() function (see #1) after choosing a move. 
 		//It can be any unplayed move given by getMoves() (see #2).
+		printf("Expansion\n");
+
 		for(i = 0; i < 200; i++)
 		{
 			if(allActions[i] == -1)
@@ -96,36 +101,33 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		if(numOfActions != 0)
 		{
 
-			for(i = 0; i < numOfActions; i+2)
+			for(i = 0; i < numOfActions; i+=2)
 			{
 			
 				action[0] = allActions[i];
 				action[1] = allActions[i+ 1];
 				//You need to implement a choose move here and then send that move as action.
-				expand(selected, action);
+				expand(&selected, action);
 				numNewNodes++;
 
 			}
 		}
-		// else
-		// {
-		// 	move[0] = -1;
-		// 	move[1] = -1;
-		// 	flag == -100;
-		//	break;
-		// }
+		printf("After Expansion\n");
+
 
 		//3. Simulate the game board on the new node until the game is complete 
-		for(j = 0; j < selected->numChildren; j++)
+		printf("Simulate\n");
+
+		for(j = 0; j < selected.numChildren; j++)
 		{
-			boardState = selected->board;
+			copyBoard(&selected.children[j]->board, &boardState);
 			while(gameContinues > 0)
 			{
 				numOfActions = 0;
 				//get board structure from the node call getmoves and for loop with while loop inside
 				//placePiece()
 				//get the move to be made and play the game until the player wins or loses
-				getMoves(boardState, allActions);
+				getMoves(&boardState, allActions);
 
 				for(i = 0; i < 200; i++)
 				{
@@ -141,9 +143,9 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 				{
 					//Randomly select a move to make
 					randomValue = numOfActions / 2;
-					randomValue = rand() % randomValue + 1;  //may not be plus 1
-					boardMove[0] = allActions[randomValue];
-					boardMove[1] = allActions[randomValue + 1]; 
+					randomValue = rand() % randomValue ;  
+					boardMove[0] = allActions[randomValue * 2];
+					boardMove[1] = allActions[randomValue * 2 + 1]; 
 				}
 				else
 				{
@@ -155,89 +157,125 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 				{
 
 					//Check if other player can move
-					flipMove(boardState->whoseMove);
-					pickMove(boardState, nodeLimit, timeLimit, boardMove);
+					//fix;	flipMove(boardState->whoseMove); 
+					selected.children[j]->board.whoseMove = (selected.children[j]->board.whoseMove == 1) ? 2 : 1;
+
+					numOfActions = 0;
+					//get board structure from the node call getmoves and for loop with while loop inside
+					//placePiece()
+					//get the move to be made and play the game until the player wins or loses
+					getMoves(&boardState, allActions);
+
+					for(i = 0; i < 200; i++)
+					{
+						if(allActions[i] == -1)
+						{
+							break;
+						}
+
+						numOfActions++;
+					}
+					//make sure that there are still actions to be taken before the game ends
+					if(numOfActions != 0)
+					{
+						//Randomly select a move to make
+						randomValue = numOfActions / 2;
+						randomValue = rand() % randomValue ;  
+						boardMove[0] = allActions[randomValue * 2];
+						boardMove[1] = allActions[randomValue * 2 + 1]; 
+					}
+					else
+					{
+						boardMove[0] = -1;
+						boardMove[1] = -1;
+					}
 
 					//determine the winner because other player cannot make a move either
 					if(boardMove[0] == -1 && boardMove[1] == -1)
 					{
 						gameContinues = -10;
-						winner = determineWinner(boardState);
+						winner = determineWinner(&boardState);
 						if(winner == 0)
 						{
-							selected->numSimulations += 1;
+							selected.children[j]->numSimulations += 1;
 
 						}
 						else if(winner == 1)
 						{
-							if(boardState->whoseMove == 1)
+							if(selected.children[j]->board.whoseMove == 1)
 							{
-								selected->numWins += 1;
+								selected.children[j]->numWins += 1;
 							}
-							selected->numSimulations += 1;
+							selected.children[j]->numSimulations += 1;
 
 						}	
 						else if(winner == 2)
 						{
-							if(boardState->whoseMove == 2)
+							if(selected.children[j]->board.whoseMove == 2)
 							{
-								selected->numWins += 1;
+								selected.children[j]->numWins += 1;
 							}
-							selected->numSimulations += 1;
+							selected.children[j]->numSimulations += 1;
 
 						}
 					}	
 					//Continue the game
 					else
 					{
-						placePiece(boardState, boardMove);
+						placePiece(&boardState, boardMove);
 					}
 				}
 				else
 				{	
-					placePiece(boardState, boardMove);
+					placePiece(&boardState, boardMove);
 				}
 
 			}
 		}
+		printf("After Simulation\n");
+
 		//4. Back-propagate results up to the root node once you get the results of your simulation.
 		//This just involves recording progress in the numWins and numSimulations members of nodes and 
 		//following parent up the tree till you hit NULL.
-		
-		 while(newNode->parent !=NULL)
-		 {
-		 	sum = 0;
-		 	numWins = 0;
-			numSims = 0;	
-		 	parentNode = newNode->parent;
-		 	//make sure that the parentNode has children
-		 	if(parentNode->numChildren > 0)
-		 	{
-		 		for(i = 0; i<parentNode->numChildren; i++)
-		 		{
+	
+		printf("Back Propagation\n");
+
+		numWins = 0;
+		numSims = 0;	
+		for(i = 0; i < selected.numChildren; i++)
+		{
 		 	
-		 			temp = parentNode->children[i];
-		 			numWins += temp->numWins;
-		 			numSims += temp->numSimulations;
-		 		}
-		 		sum = numWins + parentNode->numWins;
-		 		parentNode->numWins = sum;
-		 		sum = numSims + parentNode->numSimulations;
-		 		parentNode->numSimulations = sum;
-		 	}
-		 	newNode = parentNode;
+	 		numWins += selected.children[i]->numWins;
+		 	numSims += selected.children[i]->numSimulations;
+		}
+		parentNode = selected;
+		
+		while(parentNode.parent !=NULL)
+	    {
+		
+			// Do this to every parent node as you ascend the tree
+			parentNode.numWins += numWins; // Sum of the total wins resulting from the simulations
+			parentNode.numSimulations += numSims; // Or whatever variable you use to store the total number of simulations you just did
+			parentNode = *parentNode.parent;
 
 		 }
+		printf("After back-propagation\n");
 
+		time(&checkTime);
 		// check how much time has passed
-		timeElapsed = clock() - startTime;
+		timeElapsed = difftime(checkTime, startTime);
 		if(timeElapsed > timeLimit)
 		{
+			printf("Time check failed\n");
+
 			break;
 		}
+		printf("Time check passed\n");
+
 		//check if there are any possible moves to make
-		if(root->numChildren == 0)
+		if(root.numChildren == 0)
 		{
+			printf("root has no children\n");
 			flag =-100;
 		}
   	}
@@ -246,30 +284,38 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
   	numSims = -20;
     index = -1;
     //check that there were moves to be made
-    if(root->numChildren != 0)
+    if(root.numChildren != 0)
     {
-  		//loops to find the node that was most visited
-  		for(i = 0; i < root->numChildren; i++)
+   		printf("root does not equal zero\n");
+
+		//UCT calculation to select next node 
+		for(i = 0; i < root.numChildren; i++)
 		{
-			child = root->children[i];
-			numSims = child->numSimulations;
-			//finds the most visited node to choose the move to make
-		 	if(numSims > bestValue)
-		 	{
-		 		index = i;
-		 		selected = child;
-		 		bestValue = uctValue;
-			 }
+			child = *root.children[i];
+			//UCT calculation
+			uctValue = child.numWins / child.numSimulations + 
+			sqrt(2 * log(newNode.numSimulations / child.numSimulations));
+
+			//check if the uct value for each child is better than the one before
+			if(uctValue > bestValue)
+			{
+				index = i;
+				selected = child;
+				bestValue = uctValue;
+			}
 		} 
-		move[0] = root->childMoves[index * 2]; // row for the child that was visited the most
-		move[1] = root->childMoves[index * 2 + 1]; //col for the child that was visited the most
+
+		move[0] = root.childMoves[index * 2]; // row for the child that was visited the most
+		move[1] = root.childMoves[index * 2 + 1]; //col for the child that was visited the most
 	}
 	else
 	{
 		move[0] = -1; //root has no children nodes which means there is no moves to be made
 		move[1] = -1; 	
 	}
-  	deconstructTree(root);
+	printf("deconstruct tree\n");
+
+  	deconstructTree(&root);
 
 }
 
@@ -282,29 +328,32 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 int main()
 {
 	int gameContinues = 100;   	//loop value 
-	int * boardMove;			//the boardMove to be made
+	int boardMove[2];			//the boardMove to be made
 	int nodeLimit = 1000;  		//the node limit to be given to the function
-	int timeLimit = 3000;		//the time limit to be given to the function
+	int timeLimit = 3;		//the time limit to be given to the function
 	int winner;					//holds the value for winner
-	struct board * gameBoard;	//gameboard
-	initBoard(gameBoard);		//initialize the gameBoard
+	struct board gameBoard;		//gameboard
+	initBoard(&gameBoard);		//initialize the gameBoard
 
 	while(gameContinues > 0)
 	{
 		//picks the move
-		pickMove(gameBoard,nodeLimit,timeLimit, boardMove);
+		pickMove(&gameBoard,nodeLimit,timeLimit, boardMove);
 		
 		//check that there is a move to be made
 		if(boardMove[0] == -1 && boardMove[1] == -1)
 		{
 
 			//Check if other player can move
-			flipMove(gameBoard->whoseMove);
-			pickMove(gameBoard,nodeLimit,timeLimit,boardMove);
+			//flipMove(gameBoard->whoseMove);
+			gameBoard.whoseMove = (gameBoard.whoseMove == 1) ? 2 : 1;
+
+			pickMove(&gameBoard,nodeLimit,timeLimit, boardMove);
+
 			if(boardMove[0] == -1 && boardMove[1] == -1)
 			{
 				gameContinues =-10;
-				winner = determineWinner(gameBoard);
+				winner = determineWinner(&gameBoard);
 				if(winner == 0)
 				{
 					printf("This game was a tie");
@@ -321,12 +370,12 @@ int main()
 			//Continue the game
 			else
 			{
-				placePiece(gameBoard,boardMove);
+				placePiece(&gameBoard,boardMove);
 			}
 		}
 		else
 		{
-			placePiece(gameBoard, boardMove);
+			placePiece(&gameBoard, boardMove);
 		}
 	}
 
