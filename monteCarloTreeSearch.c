@@ -200,29 +200,13 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 					{
 						gameContinues = -10;
 						winner = determineWinner(&boardState);
-						if(winner == 0)
-						{
-							selected->children[j]->numSimulations += 1;
 
+						if (winner == selected->children[j]->whoseMove == winner)
+						{
+							selected->children[j]->numWins++;
 						}
-						else if(winner == 1)
-						{
-							if(selected->children[j]->board.whoseMove == 1)
-							{
-								selected->children[j]->numWins += 1;
-							}
-							selected->children[j]->numSimulations += 1;
 
-						}	
-						else if(winner == 2)
-						{
-							if(selected->children[j]->board.whoseMove == 2)
-							{
-								selected->children[j]->numWins += 1;
-							}
-							selected->children[j]->numSimulations += 1;
-
-						}
+						selected->children[j]->numSimulations++;
 					}	
 					//Continue the game
 					else
