@@ -29,7 +29,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 	struct board boardState;  //gameboard pointer for use in simulation    
 
 
-	int allActions[200];           //list of all actions returned by getMoves
+	int allActions[800];           //list of all actions returned by getMoves
 	int action[2];				//action to be used for expansion
 	int boardMove[2];            // boardMove for simulation
 
@@ -70,13 +70,14 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		while(selected->numChildren != 0)
 		{
 			newNode = selected;
+			bestValue = -1000;
 			//UCT calculation to select next node 
 			for(i = 0; i < newNode->numChildren; i++)
 			{
 				child = newNode->children[i];
 				//UCT calculation
-				uctValue = child->numWins / child->numSimulations + 
-				sqrt(2 * log(newNode->numSimulations / child->numSimulations));
+				uctValue = child->numWins / (float)child->numSimulations + 
+				sqrt(2 * log(newNode->numSimulations / (float)child->numSimulations));
 
 				//check if the uct value for each child is better than the one before
 				if(uctValue > bestValue)
@@ -94,7 +95,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		//It can be any unplayed move given by getMoves() (see #2).
 		printf("Expansion\n");
 
-		for(i = 0; i < 200; i++)
+		for(i = 0; i < 800; i++)
 		{
 			if(allActions[i] == -1)
 			{
@@ -117,7 +118,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 
 			}
 		}
-		printf("After Expansion\n");
+		printf("After Expansion, there are %d total nodes\n", numNewNodes);
 
 
 		//3. Simulate the game board on the new node until the game is complete 
@@ -126,6 +127,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		for(j = 0; j < selected->numChildren; j++)
 		{
 			copyBoard(&selected->children[j]->board, &boardState);
+			gameContinues = 100;
 			while(gameContinues > 0)
 			{
 				numOfActions = 0;
@@ -134,7 +136,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 				//get the move to be made and play the game until the player wins or loses
 				getMoves(&boardState, allActions);
 
-				for(i = 0; i < 200; i++)
+				for(i = 0; i < 800; i++)
 				{
 					if(allActions[i] == -1)
 					{
@@ -171,7 +173,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 					//get the move to be made and play the game until the player wins or loses
 					getMoves(&boardState, allActions);
 
-					for(i = 0; i < 200; i++)
+					for(i = 0; i < 800; i++)
 					{
 						if(allActions[i] == -1)
 						{
@@ -200,29 +202,13 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 					{
 						gameContinues = -10;
 						winner = determineWinner(&boardState);
-						if(winner == 0)
-						{
-							selected->children[j]->numSimulations += 1;
 
+						if (selected->children[j]->board.whoseMove == winner)
+						{
+							selected->children[j]->numWins++;
 						}
-						else if(winner == 1)
-						{
-							if(selected->children[j]->board.whoseMove == 1)
-							{
-								selected->children[j]->numWins += 1;
-							}
-							selected->children[j]->numSimulations += 1;
 
-						}	
-						else if(winner == 2)
-						{
-							if(selected->children[j]->board.whoseMove == 2)
-							{
-								selected->children[j]->numWins += 1;
-							}
-							selected->children[j]->numSimulations += 1;
-
-						}
+						selected->children[j]->numSimulations++;
 					}	
 					//Continue the game
 					else
@@ -298,8 +284,8 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		{
 			child = root->children[i];
 			//UCT calculation
-			uctValue = child->numWins / child->numSimulations + 
-			sqrt(2 * log(newNode->numSimulations / child->numSimulations));
+			uctValue = child->numWins / (float)child->numSimulations + 
+			sqrt(2 * log(root->numSimulations / (float)child->numSimulations));
 
 			//check if the uct value for each child is better than the one before
 			if(uctValue > bestValue)
@@ -322,6 +308,43 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 
   	deconstructTree(root);
 
+}
+
+void printBoard(struct board *board)
+{
+	int i, j;
+
+	if (board->whoseMove == 1)
+	{
+		printf("White's turn");
+	}
+	else
+	{
+		printf("Black's turn");
+	}
+
+	printf("\t| White score: %d\t| Black score: %d\n", board->whiteScore, board->blackScore);
+
+	for (i = 0; i < 32; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			switch(board->spaces[i][j])
+			{
+				case 0:
+					printf("* ");
+					break;
+				case 1:
+					printf("w ");
+					break;
+				case 2:
+					printf("b ");
+					break;
+			}
+		}
+
+		printf("\n");
+	}
 }
 
 /*
@@ -371,6 +394,8 @@ int main()
 				{
 					printf("This game was won by Black");
 				}
+
+				printBoard(&gameBoard);
 			}	
 			//Continue the game
 			else
