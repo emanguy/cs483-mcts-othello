@@ -5,17 +5,17 @@
 #include <stdlib.h>
 #include "board.h"
 
-typedef struct node node;
 
-typedef struct node{
-	node* parent;		// Pointer to parent node
+struct node{
+	struct node* parent;		// Pointer to parent node
 	struct board board;	// State of board at this node
 	int* childMoves;	// How to reach child nodes
 	int numChildren;	// Num children nodes 
 	int numWins;		// Num wins from this node
 	int numSimulations;	// Num simulations from this node
-	node** children;		// Pointers to children
-}node;
+	struct node** children;		// Pointers to children
+};
+typedef struct node node;
 
 
 // Use to create first parent node
