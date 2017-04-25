@@ -66,8 +66,10 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		//selection and the js UCT implementation as a guide).
 
 		printf("Selection\n");
+		selected = root;
 		while(selected->numChildren != 0)
 		{
+			newNode = selected;
 			//UCT calculation to select next node 
 			for(i = 0; i < newNode->numChildren; i++)
 			{
@@ -84,7 +86,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 				}
 			} 
 		}
-		newNode = selected;
+
 		printf("After selection\n");
 
 		getMoves(&selected->board, allActions);
