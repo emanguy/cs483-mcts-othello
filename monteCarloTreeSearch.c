@@ -65,7 +65,6 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		//1. Select a node using UCT and the functions provided by #1. (See the js implementation of 
 		//selection and the js UCT implementation as a guide).
 
-		printf("Selection\n");
 		selected = root;
 		while(selected->numChildren != 0)
 		{
@@ -88,12 +87,10 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 			} 
 		}
 
-		printf("After selection\n");
 
 		getMoves(&selected->board, allActions);
 		//2. Expand the selected node using the expand() function (see #1) after choosing a move. 
 		//It can be any unplayed move given by getMoves() (see #2).
-		printf("Expansion\n");
 
 		for(i = 0; i < 800; i++)
 		{
@@ -118,11 +115,8 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 
 			}
 		}
-		printf("After Expansion, there are %d total nodes\n", numNewNodes);
-
 
 		//3. Simulate the game board on the new node until the game is complete 
-		printf("Simulate\n");
 
 		for(j = 0; j < selected->numChildren; j++)
 		{
@@ -223,13 +217,11 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 
 			}
 		}
-		printf("After Simulation\n");
 
 		//4. Back-propagate results up to the root node once you get the results of your simulation.
 		//This just involves recording progress in the numWins and numSimulations members of nodes and 
 		//following parent up the tree till you hit NULL.
 	
-		printf("Back Propagation\n");
 
 		numWins = 0;
 		numSims = 0;	
@@ -250,23 +242,19 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 			parentNode = parentNode->parent;
 
 		 }
-		printf("After back-propagation\n");
 
 		time(&checkTime);
 		// check how much time has passed
 		timeElapsed = difftime(checkTime, startTime);
 		if(timeElapsed > timeLimit)
 		{
-			printf("Time check failed\n");
 
 			break;
 		}
-		printf("Time check passed\n");
 
 		//check if there are any possible moves to make
 		if(root->numChildren == 0)
 		{
-			printf("root has no children\n");
 			flag =-100;
 		}
   	}
@@ -277,7 +265,6 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
     //check that there were moves to be made
     if(root->numChildren != 0)
     {
-   		printf("root does not equal zero\n");
 
 		//UCT calculation to select next node 
 		for(i = 0; i < root->numChildren; i++)
@@ -304,7 +291,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		move[0] = -1; //root has no children nodes which means there is no moves to be made
 		move[1] = -1; 	
 	}
-	printf("deconstruct tree\n");
+	printf("Player: %d,    Move made is: (%d, %d)",gameBoard->whoseMove, move[0], move[1]);
 
   	deconstructTree(root);
 
@@ -357,7 +344,7 @@ int main()
 {
 	int gameContinues = 100;   	//loop value 
 	int boardMove[2];			//the boardMove to be made
-	int nodeLimit = 1000;  		//the node limit to be given to the function
+	int nodeLimit = 70;  		//the node limit to be given to the function
 	int timeLimit = 3;		//the time limit to be given to the function
 	int winner;					//holds the value for winner
 	struct board gameBoard;		//gameboard
