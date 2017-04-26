@@ -34,3 +34,4 @@
 
 # Mac folder thingy
 .DS_Store
+**/*.playback
