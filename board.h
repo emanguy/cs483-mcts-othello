@@ -51,6 +51,12 @@ void placePiece(struct board *gameBoard, int *position);
  * @return 1 if white won, 2 if black won, 0 if it's a tie.
  */
 int determineWinner(struct board *gameBoard);
+/*
+ * Prints the board to the command line.
+ *
+ * @param board A reference to the board to print out
+ */
+ void printBoard(struct board *board);
 
 #endif
 
