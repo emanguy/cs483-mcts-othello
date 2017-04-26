@@ -291,7 +291,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 		move[0] = -1; //root has no children nodes which means there is no moves to be made
 		move[1] = -1; 	
 	}
-	printf("Player: %d,    Move made is: (%d, %d)",gameBoard->whoseMove, move[0], move[1]);
+	printf("Player: %d,    Move made is: (%d, %d)\n",gameBoard->whoseMove, move[0], move[1]);
 
   	deconstructTree(root);
 
@@ -353,6 +353,7 @@ int main()
 	while(gameContinues > 0)
 	{
 		//picks the move
+		printf("Picking move...\n");
 		pickMove(&gameBoard,nodeLimit,timeLimit, boardMove);
 		
 		//check that there is a move to be made
