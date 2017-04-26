@@ -55,7 +55,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 	initializeRoot(root, gameBoard);	  // initialize root  
 	newNode = root;  					// temporary newNode
 	selected = root;					//initialize selected value for expansion
-
+	srand(time(NULL));
 	while(numNewNodes < nodeLimit && flag > 0)
 	{
 		gameContinues = 100;	//initialize the simulation phase gameloop value
