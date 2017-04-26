@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include "../board.h"
 
-void printBoard(struct board *board);
-
 int main(int numArgs, char** args)
 {
     if (numArgs < 2)
@@ -63,41 +61,4 @@ int main(int numArgs, char** args)
 
     fclose(playbackFile);
     return 0;
-}
-
-void printBoard(struct board *board)
-{
-	int i, j;
-
-	if (board->whoseMove == 1)
-	{
-		printf("White's turn");
-	}
-	else
-	{
-		printf("Black's turn");
-	}
-
-	printf("\t| White score: %d\t| Black score: %d\n", board->whiteScore, board->blackScore);
-
-	for (i = 0; i < 32; i++)
-	{
-		for (j = 0; j < 32; j++)
-		{
-			switch(board->spaces[i][j])
-			{
-				case 0:
-					printf("* ");
-					break;
-				case 1:
-					printf("w ");
-					break;
-				case 2:
-					printf("b ");
-					break;
-			}
-		}
-
-		printf("\n");
-	}
 }
