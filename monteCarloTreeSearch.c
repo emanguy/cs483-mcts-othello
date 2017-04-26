@@ -349,6 +349,8 @@ int main()
 	int winner;					//holds the value for winner
 	struct board gameBoard;		//gameboard
 	initBoard(&gameBoard);		//initialize the gameBoard
+	srand(time(NULL));
+
 
 	while(gameContinues > 0)
 	{
