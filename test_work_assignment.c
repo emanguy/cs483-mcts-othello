@@ -57,12 +57,14 @@ int main()
 
 void master(int numProcesses, MPI_Datatype boardType)
 {
-    int numMessages, numSends, numReceives, total, recvBuf, i;
+    int numMessages = 20, 
+        numSends = 0, 
+        numReceives = 0, 
+        total = 0, 
+        recvBuf, i;
     struct board gameBoard;
     MPI_Status workerStatus;
 
-    numMessages = numProcesses;
-    total = 0;
     initBoard(&gameBoard);
 
     // Initially send work to all processes
@@ -75,14 +77,35 @@ void master(int numProcesses, MPI_Datatype boardType)
             break;
     }
 
-    // Retrieve results from all processes
+    // Retrieve results and assign work from processes that finished early
+    while (numReceives < numMessages)
+    {
+        // Receive result from worker
+        MPI_Recv(&recvBuf, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &workerStatus);
+        printf("Process 0: Got result from process %d", workerStatus.MPI_SOURCE);
+        numReceives++;
+        total += recvBuf;
+
+        // Assign more work if there is more to be done
+        if (numSends < numMessages)
+        {
+            MPI_Send(&gameBoard, 1, boardType, workerStatus.MPI_SOURCE, WORK, MPI_COMM_WORLD);
+            numSends++;
+            printf(", assigning more work.\n");
+        }
+        else 
+        {
+            printf("\n");
+        }
+    }
+
+    // Tell worker processes to terminate
     for (i = 1; i < numProcesses; i++)
     {
-        MPI_Recv(&recvBuf, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &workerStatus);
         // When I get data from a worker, I add its result to total and send it a "die" signal
-        printf("Process 0: Got data from process %d, telling it to die.\n", workerStatus.MPI_SOURCE);
+        printf("Process 0: Work complete, telling process %d to die.\n", i);
         total += recvBuf;
-        MPI_Send(NULL, 0, boardType, workerStatus.MPI_SOURCE, DIE, MPI_COMM_WORLD);
+        MPI_Send(NULL, 0, boardType, i, DIE, MPI_COMM_WORLD);
     }
 
     printf("Complete! Total is %d.\n", total);
@@ -90,9 +113,14 @@ void master(int numProcesses, MPI_Datatype boardType)
 
 void slave(int id, MPI_Datatype boardType)
 {
-    int sendBuf = 5;
+    int sendBuf = 5,
+        maxNumMoves = 10,
+        numMoves,
+        possibleMoves[200];
     struct board gameBoard;
     MPI_Status masterStatus;
+
+    srand(time(NULL));
 
     // Listen for more game boards forever
     while (1)
@@ -106,10 +134,25 @@ void slave(int id, MPI_Datatype boardType)
             break;
         }
 
-        printf("Process %d: Received a game board from master!\n\n", id);
-        printBoard(&gameBoard);
+        numMoves = rand() % maxNumMoves + 1;
+        sendBuf = numMoves;
 
-        // Send result to master
+        printf("Process %d: Received a game board from master! Playing %d moves...\n", id, numMoves);
+        // Do some arbitrary work on the board
+        while (numMoves > 0)
+        {
+            numMoves--;
+            getMoves(&gameBoard, possibleMoves);
+
+            if (possibleMoves[0] == -1)
+            {
+                break;
+            }
+
+            placePiece(&gameBoard, possibleMoves);
+        }
+
+        // Send # moves executed to master
         MPI_Send(&sendBuf, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
     }
 
