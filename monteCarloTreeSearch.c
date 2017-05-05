@@ -6,7 +6,7 @@
 * Description: This file contains the code for the main of Othello and the monte Carlo Tree Search
 * code that will run the game Othello and determine the best move to be made.
 * Compile using:
-* gcc -lm -Wall -o monteCarloTreeSearch monteCarloTreeSearch.c board.c node.c
+* make mcts
 */
 
 #include <time.h>
@@ -20,7 +20,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int *move);
 int selectByIndex(node* selectFrom);
 int actionSize(int* moves);
 int expandAllChildren(node* toExpand, int* moveSet);
-int simulate(node *toSimulate);
+int simulate(struct board *toSimulate);
 void pickRandomMove(int *moves, int movesSize, int pickedMove[2]);
 
 /*
@@ -144,11 +144,11 @@ int expandAllChildren(node* toExpand, int* moveSet)
 }
 
 // Simulates a board till the end of the game
-int simulate(node* toSimulate)
+int simulate(struct board *toSimulate)
 {
 	struct board boardState;
 
-	copyBoard(&toSimulate->board, &boardState);
+	copyBoard(toSimulate, &boardState);
 
 	int numOfActions;
 	int boardMove[2], allActions[800];
@@ -281,7 +281,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
             // Doing this 3 times because I discovered once we hit the middle of the game we're not expanding more than 1 time
 			for (i = 0; i < 3; i++)
 			{
-				numWins = simulate(selected->children[j]);
+				numWins = simulate(&selected->children[j]->board);
 				selected->children[j]->numWins += numWins;
 				selected->children[j]->numSimulations++;
 			}
