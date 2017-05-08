@@ -195,7 +195,7 @@ int determineWinner(struct board *gameBoard)
 	{
 		return 1;
 	}
-	else if (gameBoard->whiteScore > gameBoard->blackScore) 
+	else if (gameBoard->whiteScore < gameBoard->blackScore) 
 	{
 		return 2;
 	}
