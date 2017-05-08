@@ -115697,7 +115697,8 @@ Num total expanded nodes: 0
 Player: 2,    Move made is: (-1, -1)
 Num total expanded nodes: 0
 Player: 1,    Move made is: (-1, -1)
-This game was won by BlackWhite's turn	| White score: 508	| Black score: 516
+This game was won by Black
+White's turn	| White score: 508	| Black score: 516
 ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ○ ○ 
 ● ● ● ● ● ○ ○ ● ● ○ ○ ● ○ ● ○ ○ ○ ○ ● ● ○ ○ ○ ○ ● ○ ● ○ ○ ○ ○ ○ 
 ● ● ● ● ○ ○ ● ○ ○ ● ● ○ ● ○ ● ○ ○ ● ○ ● ● ○ ○ ○ ○ ● ● ● ○ ○ ○ ○ 
@@ -115730,3 +115731,8 @@ This game was won by BlackWhite's turn	| White score: 508	| Black score: 516
 ○ ● ● ● ○ ● ● ● ● ○ ● ○ ○ ○ ○ ○ ○ ○ ● ○ ● ○ ● ● ● ● ● ○ ○ ● ○ ● 
 ○ ○ ● ● ● ● ● ● ● ● ○ ● ● ○ ○ ○ ● ● ○ ○ ○ ● ○ ● ● ● ● ● ○ ○ ● ● 
 ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● 
+
+---TIME OUTPUT---
+
+7316.15user 14.93system 2:02:10elapsed 100%CPU (0avgtext+0avgdata 2360maxresident)k
+0inputs+6400outputs (0major+18862minor)pagefaults 0swaps

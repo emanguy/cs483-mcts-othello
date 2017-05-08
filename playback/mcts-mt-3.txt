@@ -56172,7 +56172,8 @@ Num total expanded nodes: 0
 Player: 2,    Move made is: (-1, -1)
 Num total expanded nodes: 0
 Player: 1,    Move made is: (-1, -1)
-This game was won by BlackWhite's turn	| White score: 359	| Black score: 665
+This game was won by Black
+White's turn	| White score: 359	| Black score: 665
 ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ 
 ○ ○ ○ ○ ● ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ○ ● ○ ○ ○ ○ ○ ○ 
 ○ ○ ○ ○ ○ ○ ● ○ ● ○ ○ ○ ● ○ ○ ○ ● ○ ○ ○ ● ○ ● ○ ● ○ ● ○ ○ ○ ○ ○ 

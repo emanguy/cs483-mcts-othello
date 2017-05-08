@@ -88625,7 +88625,8 @@ Num total expanded nodes: 0
 Player: 1,    Move made is: (-1, -1)
 Num total expanded nodes: 0
 Player: 2,    Move made is: (-1, -1)
-This game was won by WhiteBlack's turn	| White score: 559	| Black score: 465
+This game was won by White
+Black's turn	| White score: 559	| Black score: 465
 ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ● ○ ○ ● ○ 
 ● ● ● ● ● ● ● ● ○ ● ○ ● ● ● ○ ● ● ● ● ● ● ○ ● ● ● ● ● ○ ○ ○ ● ○ 
 ● ● ● ● ● ● ● ● ○ ● ● ● ● ● ● ○ ○ ● ○ ○ ● ○ ○ ○ ● ○ ○ ○ ○ ○ ● ○ 
