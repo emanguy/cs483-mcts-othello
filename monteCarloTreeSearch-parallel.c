@@ -15,6 +15,7 @@
 #include <math.h>
 #include <mpi.h>
 #include <stddef.h>
+#include <sys/time.h>
 #include "node.h"
 #include "board.h"
 
@@ -328,7 +329,9 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move, 
     MPI_Status workerStatus;
 
 
-	time_t startTime, checkTime; //used to calculate the time that has passed
+	time_t startTime, checkTime;
+	struct timeval simulationStart, simulationEnd; //used to calculate the time that has passed
+	unsigned long long duration;
 
 	time(&startTime);				//track time limit
 	root = malloc(sizeof(node));
@@ -355,6 +358,7 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move, 
 
 		//3. Simulate the game board on the new node until the game is complete 
 
+		gettimeofday(&simulationStart, NULL);
         numSends = 0;
         numRecvs = 0;
         // Initially send work to all processes
@@ -384,6 +388,10 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move, 
                 numSends++;
             }
         }
+
+		gettimeofday(&simulationEnd, NULL);
+		duration = 1000 * (simulationEnd.tv_sec - simulationStart.tv_sec) + (simulationEnd.tv_usec - simulationStart.tv_usec) / 1000;
+		printf("Simulation took %llu milliseconds\n", duration);
 
 		//4. Back-propagate results up to the root node once you get the results of your simulation.
 		//This just involves recording progress in the numWins and numSimulations members of nodes and 

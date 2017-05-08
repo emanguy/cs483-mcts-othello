@@ -11,7 +11,8 @@
 
 #include <time.h>
 #include <stdlib.h>
-#include <stdio.h> 
+#include <stdio.h>
+#include <sys/time.h>
 #include <math.h>
 #include "node.h"
 #include "board.h"
@@ -250,6 +251,8 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
   	int index;					//used for finding the index of the move to be made 
 
 	time_t startTime, checkTime; //used to calculate the time that has passed
+	unsigned long long duration;
+	struct timeval simulateStart, simulateEnd;
 
 	time(&startTime);				//track time limit
 	root = malloc(sizeof(node));
@@ -276,6 +279,8 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 
 		//3. Simulate the game board on the new node until the game is complete 
 
+		gettimeofday(&simulateStart, NULL);
+
 		for(j = 0; j < selected->numChildren; j++)
 		{
             // Doing this 3 times because I discovered once we hit the middle of the game we're not expanding more than 1 time
@@ -286,6 +291,10 @@ void pickMove(struct board* gameBoard, int nodeLimit, int timeLimit, int* move)
 				selected->children[j]->numSimulations++;
 			}
 		}
+
+		gettimeofday(&simulateEnd, NULL);
+		duration = 1000 * (simulateEnd.tv_sec - simulateStart.tv_sec) + (simulateEnd.tv_usec - simulateStart.tv_usec) / 1000;
+		printf("Simulation took %llu milliseconds\n", duration);
 
 		//4. Back-propagate results up to the root node once you get the results of your simulation.
 		//This just involves recording progress in the numWins and numSimulations members of nodes and 
